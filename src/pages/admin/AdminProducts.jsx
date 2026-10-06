@@ -1,0 +1,13 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import Button from '../../components/common/Button'
+import Loader from '../../components/common/Loader'
+import EmptyState from '../../components/common/EmptyState'
+import Toast from '../../components/common/Toast'
+import ProductSearch from '../../components/products/ProductSearch'
+import ProductFilter from '../../components/products/ProductFilter'
+import ProductTable from '../../components/products/ProductTable'
+import DeleteProductModal from '../../components/products/DeleteProductModal'
+import useProducts from '../../hooks/useProducts'
+import { deleteProduct } from '../../services/productApi'
+export default function AdminProducts(){const [search,setSearch]=useState(''),[category,setCategory]=useState(''),[minPrice,setMinPrice]=useState(''),[maxPrice,setMaxPrice]=useState(''),[sort,setSort]=useState('newest'),[selected,setSelected]=useState(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);const {products,loading,reload}=useProducts({search,category,minPrice,maxPrice,sort});const categories=[...new Set(products.map(p=>p.category).filter(Boolean))];async function confirmDelete(){setBusy(true);try{await deleteProduct(selected._id);setSelected(null);await reload()}catch(e){setError(e.response?.data?.message||'Could not delete product')}finally{setBusy(false)}}return <section><div className="mb-6 flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-widest text-emerald-700">Catalogue</p><h1 className="mt-1 text-3xl font-bold">Manage products</h1></div><Link to="/admin/products/add" className="rounded-xl bg-emerald-800 px-4 py-3 text-sm font-semibold text-white">＋ Add product</Link></div><div className="mb-4 flex flex-wrap gap-3"><ProductSearch value={search} onChange={setSearch}/><ProductFilter categories={categories} category={category} onCategory={setCategory} minPrice={minPrice} maxPrice={maxPrice} onMinPrice={setMinPrice} onMaxPrice={setMaxPrice} sort={sort} onSort={setSort}/></div>{loading?<Loader/>:products.length?<ProductTable products={products} onDelete={setSelected}/>:<EmptyState title="No products found" message="Add a product or adjust your filters."/>}<DeleteProductModal product={selected} onCancel={()=>setSelected(null)} onConfirm={confirmDelete} busy={busy}/><Toast message={error} onClose={()=>setError('')}/></section>}

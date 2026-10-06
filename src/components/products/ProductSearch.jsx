@@ -1,0 +1,1 @@
+export default function ProductSearch({ value, onChange }) { return <label className="flex min-w-48 flex-1 items-center gap-2 rounded-xl border bg-white px-3"><span className="text-slate-400">⌕</span><input className="w-full py-2.5 text-sm outline-none" placeholder="Search products…" value={value} onChange={(e) => onChange(e.target.value)}/></label> }
